@@ -1,10 +1,10 @@
 #!/bin/sh
-# Copyright (c) 2018 Chris Cromer
+# Copyright (c) 2018 - 2022 Chris Cromer
 # Released under the 2-clause BSD license.
 #
 # This is an implementation of the systemd-sysusers command
 
-sysusersver=0.6
+sysusersver=0.7
 
 warninvalid() {
 	printf "sysusers: %s on line %d of '%s'\n" "${1:-ignoring invalid entry}" \
