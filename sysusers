@@ -100,7 +100,7 @@ parse_string() {
 			fi
 		;;
 		m)
-			add_group "${name}" '-'
+			add_group "${id}" '-'
 			if id "${name}" >/dev/null 2>&1; then
 				usermod -a -G "${id}" "${name}"
 			else
