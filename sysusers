@@ -66,9 +66,29 @@ parse_file() {
 
 parse_string() {
 	[ -n "${1%%#*}" ] || return
+	full_line=$1
 
-	eval "set -- $1"
+	#eval "set -- $1" # do not  use eval, see CVE-2021-40084
+	set -- $1
 	type="$1" name="$2" id="$3" gecos="$4" home="$5"
+
+	# and now set the GECOS field without eval
+	if [ "${type}" = u ]; then
+		if  [ ! -z "$4" ] && [  "$4" != '-' ]; then
+			# strip everything before the first "
+			gecosplus=${full_line#*\"}
+			# now strip everything after the last "
+			gecos=${gecosplus%\"*}
+			# check if there are other valid fields after GECOS
+			gecostest=$(echo $gecosplus | grep -o '".*' -)
+			if [ "$gecostest" = '"' ]; then
+				home=
+			else
+				set -- $gecostest
+				home=$2
+			fi
+		fi
+	fi
 
 	case "${type}" in
 		[gu])
