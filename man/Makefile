@@ -11,28 +11,49 @@ xsltargs = --nonet \
 	--stringparam man.copyright.section.enabled 0 \
 	--stringparam systemd.version 238.51
 
-all:
+all: man
+ifeq ($(HAVEDOC),yes)
+all: doc
+endif
+
+man:
 	xsltproc $(xsltargs) custom-man.xsl systemd-sysusers.xml
-	xsltproc $(xsltargs) custom-html.xsl systemd-sysusers.xml > systemd-sysusers.html
 	xsltproc $(xsltargs) custom-man.xsl sysusers.d.xml
-	xsltproc $(xsltargs) custom-html.xsl sysusers.d.xml > sysusers.d.html
+
+doc:
+	xsltproc $(xsltargs) -o systemd-sysusers.html custom-html.xsl systemd-sysusers.xml
+	xsltproc $(xsltargs) -o sysusers.d.html custom-html.xsl sysusers.d.xml
 
 clean:
-	rm $(manfiles5)
-	rm $(manfiles8)
-	rm $(docfiles)
+	rm -f $(manfiles5)
+	rm -f $(manfiles8)
+	rm -f $(docfiles)
 
-install:
+install-man:
 	$(INSTALL) -d $(DESTDIR)$(MANDIR)/man5 $(DESTDIR)$(MANDIR)/man8
 	$(INSTALL) -m $(DOCMODE) $(manfiles5) $(DESTDIR)$(MANDIR)/man5
 	$(INSTALL) -m $(DOCMODE) $(manfiles8) $(DESTDIR)$(MANDIR)/man8
+
+install-doc:
 	$(INSTALL) -d $(DESTDIR)$(DOCDIR)
 	$(INSTALL) -m $(DOCMODE) $(docfiles) $(DESTDIR)$(DOCDIR)
 
-uninstall:
+install: install-man
+ifeq ($(HAVEDOC),yes)
+install: install-doc
+endif
+
+uninstall-man:
 	for man in ${manfiles5}; do rm -f $(DESTDIR)$(MANDIR)/man5/$$man; done
 	for man in ${manfiles8}; do rm -f $(DESTDIR)$(MANDIR)/man8/$$man; done
+
+uninstall-doc:
 	for doc in ${docfiles}; do rm -f $(DESTDIR)$(DOCDIR)/$$doc; done
 	rm -rf --one-file-system $(DESTDIR)$(DOCDIR)
 
-.PHONY: all install clean
+uninstall: uninstall-man
+ifeq ($(HAVEDOC),yes)
+uninstall: uninstall-doc
+endif
+
+.PHONY: all install install-man install-doc clean

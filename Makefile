@@ -13,6 +13,7 @@ MAKE = make
 HAVESYSTEMD = yes
 HAVEOPENRC = no
 HAVEMAN = yes
+HAVEDOC = no
 
 INITD = opensysusers.initd
 
@@ -32,7 +33,7 @@ all: $(INITD)
 endif
 ifeq ($(HAVEMAN),yes)
 all:
-	+$(MAKE) INSTALL=$(INSTALL) DOCMODE=$(MODE) MANDIR=$(MANDIR) DOCDIR=$(DOCDIR) DESTDIR=$(DESTDIR) -C man
+	+$(MAKE) HAVEDOC=$(HAVEDOC) INSTALL=$(INSTALL) DOCMODE=$(MODE) MANDIR=$(MANDIR) DOCDIR=$(DOCDIR) DESTDIR=$(DESTDIR) -C man
 endif
 
 EDIT = sed "s|@BINNAME[@]|$(BINNAME)|"
