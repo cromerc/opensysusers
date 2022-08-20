@@ -4,7 +4,7 @@
 #
 # This is an implementation of the systemd-sysusers command
 
-sysusersver=0.7
+sysusersver=0.7.1
 
 warninvalid() {
 	printf "sysusers: %s on line %d of '%s'\n" "${1:-ignoring invalid entry}" \
