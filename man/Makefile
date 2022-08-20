@@ -24,6 +24,23 @@ doc:
 	xsltproc $(xsltargs) -o systemd-sysusers.html custom-html.xsl systemd-sysusers.xml
 	xsltproc $(xsltargs) -o sysusers.d.html custom-html.xsl sysusers.d.xml
 
+# Delete files because wget can't overwrite them
+download-docs:
+	rm -f *.xml *.xsl
+	if command -v wget; then \
+		download='wget'; \
+	elif command -v curl; then \
+		download='curl --location --remote-name-all'; \
+	elif command -v fetch; then \
+		download='fetch'; \
+	fi; \
+	$$download \
+		'https://github.com/systemd/systemd/raw/main/man/custom-html.xsl' \
+		'https://github.com/systemd/systemd/raw/main/man/custom-man.xsl' \
+		'https://github.com/systemd/systemd/raw/main/man/standard-options.xml' \
+		'https://github.com/systemd/systemd/raw/main/man/systemd-sysusers.xml' \
+		'https://github.com/systemd/systemd/raw/main/man/sysusers.d.xml'
+
 clean:
 	rm -f $(manfiles5)
 	rm -f $(manfiles8)
@@ -56,4 +73,4 @@ ifeq ($(HAVEDOC),yes)
 uninstall: uninstall-doc
 endif
 
-.PHONY: all install install-man install-doc clean
+.PHONY: all man doc download-docs clean install install-man install-doc uninstall-man uninstall-doc uninstall
