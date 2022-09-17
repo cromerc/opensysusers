@@ -45,6 +45,7 @@ download-docs:
 		'https://github.com/systemd/systemd/raw/main/man/custom-html.xsl' \
 		'https://github.com/systemd/systemd/raw/main/man/custom-man.xsl' \
 		'https://github.com/systemd/systemd/raw/main/man/standard-options.xml' \
+		'https://github.com/systemd/systemd/raw/main/man/standard-specifiers.xml' \
 		'https://github.com/systemd/systemd/raw/main/man/systemd-sysusers.xml' \
 		'https://github.com/systemd/systemd/raw/main/man/sysusers.d.xml' \
 		'https://github.com/systemd/systemd/raw/main/docs/UIDS-GIDS.md' \
