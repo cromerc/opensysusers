@@ -15,9 +15,9 @@ warninvalid() {
 add_group() {
 	# add_group <name> <id>
 	if [ "$2" = '-' ]; then
-		grep -q "^$1:" /etc/group || groupadd -r "$1"
-	elif ! grep -q "^$1:\|^[^:]*:[^:]*:$2:[^:]*$" /etc/group; then
-		groupadd -g "$2" "$1"
+		grep -q "^$1:" "$root/etc/group" || groupadd --prefix "$root" -r "$1"
+	elif ! grep -q "^$1:\|^[^:]*:[^:]*:$2:[^:]*$" "$root/etc/group"; then
+		groupadd --prefix "$root" -g "$2" "$1"
 	fi
 }
 
@@ -25,11 +25,11 @@ add_user() {
 	# add_user <name> <id> <gecos> <home>
 	if ! id "$1" >/dev/null 2>&1; then
 		if [ "$2" = '-' ]; then
-			useradd -rc "$3" -g "$1" -d "$4" -s '/sbin/nologin' "$1"
+			useradd --prefix "$root" -rc "$3" -g "$1" -d "$4" -s '/sbin/nologin' "$1"
 		else
-			useradd -rc "$3" -u "$2" -g "$1" -d "$4" -s '/sbin/nologin' "$1"
+			useradd --prefix "$root" -rc "$3" -u "$2" -g "$1" -d "$4" -s '/sbin/nologin' "$1"
 		fi
-		passwd -l "$1" >/dev/null 2>&1
+		passwd --prefix "$root" -l "$1" >/dev/null 2>&1
 	fi
 }
 
@@ -102,10 +102,10 @@ parse_string() {
 		m)
 			add_group "${id}" '-'
 			if id "${name}" >/dev/null 2>&1; then
-				usermod -a -G "${id}" "${name}"
+				usermod --prefix "$root" -a -G "${id}" "${name}"
 			else
-				useradd -r -g "${id}" -s '/sbin/nologin' "${name}"
-				passwd -l "${name}" >/dev/null 2>&1
+				useradd --prefix "$root" -r -g "${id}" -s '/sbin/nologin' "${name}"
+				passwd --prefix "$root" -l "${name}" >/dev/null 2>&1
 			fi
 		;;
 		r)
