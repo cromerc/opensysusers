@@ -22,12 +22,16 @@ add_group() {
 }
 
 add_user() {
-	# add_user <name> <id> <gecos> <home>
+	# add_user <name> <uid> <gid> <gecos> <home>
 	if ! id "$1" >/dev/null 2>&1; then
 		if [ "$2" = '-' ]; then
-			useradd --prefix "$root" -rc "$3" -g "$1" -d "$4" -s '/sbin/nologin' "$1"
+			if [ "$3" = '-' ]; then
+				useradd --prefix "$root" -rc "$4" -g "$1" -d "$5" -s '/sbin/nologin' "$1"
+			else
+				useradd --prefix "$root" -rc "$4" -g "$3" -d "$5" -s '/sbin/nologin' "$1"
+			fi
 		else
-			useradd --prefix "$root" -rc "$3" -u "$2" -g "$1" -d "$4" -s '/sbin/nologin' "$1"
+			useradd --prefix "$root" -rc "$4" -u "$2" -g "$3" -d "$5" -s '/sbin/nologin' "$1"
 		fi
 		passwd --prefix "$root" -l "$1" >/dev/null 2>&1
 	fi
@@ -91,13 +95,22 @@ parse_string() {
 	fi
 
 	case "${type}" in
-		[gu])
-			case "${id}" in 65535|4294967295) warninvalid; return; esac
+		u)
+			uid=${id%%:*}
+			gid=${id##*:}
+			case "${uid}" in 65535|4294967295) warninvalid; return; esac
+			case "${gid}" in 65535|4294967295) warninvalid; return; esac
+			if [ "${uid}" != '-' ] && [ "${gid}" = '-' ]; then warninvalid; return; fi
 			[ "${home:--}" = '-' ] && home='/'
-			add_group "${name}" "${id}"
-			if [ "${type}" = u ]; then
-				add_user "${name}" "${id}" "${gecos}" "${home}"
+			if [ "${uid}" = "${id}" ]; then
+				# No specific gid, create group for this user
+				add_group "${name}" "${id}"
 			fi
+			add_user "${name}" "${uid}" "${gid}" "${gecos}" "${home}"
+		;;
+		g)
+			case "${id}" in 65535|4294967295) warninvalid; return; esac
+			add_group "${name}" "${id}"
 		;;
 		m)
 			add_group "${id}" '-'
