@@ -22,7 +22,7 @@ add_group() {
 }
 
 add_user() {
-	# add_user <name> <uid> <gid> <gecos> <home>
+	# add_user <name> <uid> <gid> <gecos> <home> [locked]*
 	if ! id "$1" >/dev/null 2>&1; then
 		if [ "$2" = '-' ]; then
 			if [ "$3" = '-' ]; then
@@ -34,6 +34,12 @@ add_user() {
 			useradd --prefix "$root" -rc "$4" -u "$2" -g "$3" -d "$5" -s '/sbin/nologin' "$1"
 		fi
 		passwd --prefix "$root" -l "$1" >/dev/null 2>&1
+		while [ $# -gt 5 ]; do
+			case "$6" in
+				locked) usermod --prefix "$root" -e 1 "$1" ;;
+			esac
+			shift
+		done
 	fi
 }
 
@@ -74,7 +80,8 @@ parse_string() {
 
 	#eval "set -- $1" # do not  use eval, see CVE-2021-40084
 	set -- $1
-	type="$1" name="$2" id="$3" gecos="$4" home="$5"
+	suffix="${1#?}"
+	type="${1%%${suffix}}" name="$2" id="${3:--}" gecos="${4:--}" home="$5"
 
 	# and now set the GECOS field without eval
 	if [ "${type}" = u ]; then
@@ -106,7 +113,12 @@ parse_string() {
 				# No specific gid, create group for this user
 				add_group "${name}" "${id}"
 			fi
-			add_user "${name}" "${uid}" "${gid}" "${gecos}" "${home}"
+			case "${suffix}" in
+				'!') locked=1;;
+				'') ;;
+				*) warninvalid; return;;
+			esac
+			add_user "${name}" "${uid}" "${gid}" "${gecos}" "${home}" ${locked:+locked}
 		;;
 		g)
 			case "${id}" in 65535|4294967295) warninvalid; return; esac
