@@ -15,7 +15,7 @@ HAVEOPENRC = no
 HAVEMAN = yes
 HAVEDOC = no
 
-INITD = opensysusers.initd
+INITD = openrc/opensysusers.initd
 
 BASIC = basic.conf
 
