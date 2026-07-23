@@ -1,5 +1,5 @@
 SYSCONFDIR = /etc
-PREFIX ?= /usr/local
+PREFIX ?= /usr
 BINDIR = $(PREFIX)/bin
 LIBDIR = $(PREFIX)/lib
 MANDIR = $(PREFIX)/share/man
@@ -10,9 +10,9 @@ MODE = 0644
 INSTALL = install
 MAKE = make
 
-HAVESYSTEMD = yes
-HAVEOPENRC = no
-HAVEMAN = yes
+HAVESYSTEMD = no
+HAVEOPENRC = yes
+HAVEMAN = no
 HAVEDOC = no
 
 INITD = openrc/opensysusers.initd
